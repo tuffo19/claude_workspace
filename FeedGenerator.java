@@ -1,4 +1,8 @@
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +16,8 @@ public class FeedGenerator {
 
     private static final String ATOM_NS = "http://www.w3.org/2005/Atom";
     private static final String G_NS = "http://base.google.com/ns/1.0";
+
+    private static final Path OUTPUT_FILE = Paths.get("/SETUP/feed/feed.xml");
 
     private static final String SQL =
             "select catentry_id as \"g:id\", " +
@@ -77,7 +83,14 @@ public class FeedGenerator {
         writer.flush();
         writer.close();
 
-        return stringWriter.toString();
+        String xml = stringWriter.toString();
+        writeToFile(xml);
+        return xml;
+    }
+
+    private static void writeToFile(String xml) throws Exception {
+        Files.createDirectories(OUTPUT_FILE.getParent());
+        Files.write(OUTPUT_FILE, xml.getBytes(StandardCharsets.UTF_8));
     }
 
     private static void writeTextElement(XMLStreamWriter writer, String namespace,
