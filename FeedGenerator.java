@@ -17,7 +17,8 @@ public class FeedGenerator {
             "select catentry_id as \"g:id\", " +
             "       title as \"title\", " +
             "       cat_desc as \"description\", " +
-            "       gtin as \"g:gtin\" " +
+            "       gtin as \"g:gtin\", " +
+            "       prod_price as \"g:price\" " +
             "from products";
 
     public String generateFeed(Connection connection) throws Exception {
@@ -51,6 +52,7 @@ public class FeedGenerator {
                 String title = rs.getString("title");
                 String description = rs.getString("description");
                 String gtin = rs.getString("g:gtin");
+                String price = rs.getString("g:price");
 
                 writer.writeStartElement(ATOM_NS, "entry");
 
@@ -61,6 +63,10 @@ public class FeedGenerator {
                 if (gtin != null) {
                     writeTextElement(writer, G_NS, "gtin", gtin);
                 }
+
+                writer.writeStartElement(G_NS, "shipping");
+                writeTextElement(writer, G_NS, "price", nullToEmpty(price));
+                writer.writeEndElement();
 
                 writer.writeEndElement();
             }
